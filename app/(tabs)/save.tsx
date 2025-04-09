@@ -24,6 +24,7 @@ import SearchBar from "@/components/SearchBar";
 import MovieCard from "@/components/MovieCard";
 import TrendingCard from "@/components/TrendingCard";
 
+
 const Save = () => {
   const {
     data: movies,
@@ -36,6 +37,8 @@ const Save = () => {
     loading: trendingLoading,
     error: trendingError,
   } = useFetch(getTrendingMovies);
+
+  
   
    return (
      <SafeAreaView className="bg-primary flex-1">

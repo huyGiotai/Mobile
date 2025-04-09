@@ -75,7 +75,7 @@ export default function Landing() {
             height: '100%',
             padding: 20
       }}>
-        <Marquee spacing={300} speed={1.3}
+        <Marquee spacing={300} speed={1.5}
             >
         <Text style={{
             fontFamily: 'outfit-bold',
