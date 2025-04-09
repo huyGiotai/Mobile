@@ -41,7 +41,7 @@ const Play = async () => {
     [
       { 
         text: "OK", 
-        onPress: () => Linking.openURL("https://motphim.es/phim/nguoi-doi-ninja-doi-dau-lien-minh-yakuza/tap-full") 
+        onPress: () => Linking.openURL("https://motphim.es/phim/dai-chien-titan-phan-6/tap-1") 
       }
     ]
   );
