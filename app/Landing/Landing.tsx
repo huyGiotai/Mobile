@@ -88,7 +88,7 @@ export default function Landing() {
         </Marquee>
 
         <TouchableOpacity style={styles.button}
-        onPress={() => router.push('/')}>
+        onPress={() => router.push('/Login/login')}>
             <Text style={{
                 textAlign: 'center',
                 color: '#fff',
