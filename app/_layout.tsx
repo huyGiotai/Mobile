@@ -42,6 +42,20 @@ export default function RootLayout() {
             headerShown: false,
           }}
         />
+
+        <Stack.Screen
+          name="Edit/edit"
+          options={{
+            headerShown: false,
+          }}
+        />
+
+<Stack.Screen
+          name="Login/resetpassword"
+          options={{
+            headerShown: false,
+          }}
+        />
         
       </Stack>
     </>
