@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity,Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { auth } from '../Login/firebaseConfig';
 import { updateProfile, updatePassword } from 'firebase/auth';
 import { db } from '../Login/firebaseConfig';
@@ -43,7 +43,6 @@ export default function EditProfileScreen() {
     fetchUserData();
   }, [user]);
 
-  // Kiểm tra định dạng ngày sinh (dd/mm/yyyy)
   const validateBirthday = (date: string) => {
     const regex = /^\d{2}\/\d{2}\/\d{4}$/;
     if (!regex.test(date)) return false;
@@ -59,7 +58,6 @@ export default function EditProfileScreen() {
     );
   };
 
-  // Kiểm tra định dạng số điện thoại Việt Nam
   const validatePhoneNumber = (phone: string) => {
     const regex = /^(0|\+84)[35789]\d{8}$/;
     return regex.test(phone);
@@ -69,19 +67,16 @@ export default function EditProfileScreen() {
     setError('');
     setSuccess('');
 
-    // Kiểm tra tên hiển thị
     if (!displayName.trim()) {
       setError('Vui lòng nhập tên hiển thị!');
       return;
     }
 
-    // Kiểm tra ngày sinh nếu có nhập
     if (birthday && !validateBirthday(birthday)) {
       setError('Ngày sinh không hợp lệ! Định dạng: dd/mm/yyyy');
       return;
     }
 
-    // Kiểm tra số điện thoại nếu có nhập
     if (phoneNumber && !validatePhoneNumber(phoneNumber)) {
       setError('Số điện thoại không hợp lệ! Ví dụ: 0901234567 hoặc +84901234567');
       return;
@@ -93,21 +88,18 @@ export default function EditProfileScreen() {
     }
 
     try {
-      // Bước 1: Cập nhật thông tin qua Firebase Auth
       console.log('Bắt đầu cập nhật Firebase Auth...');
       await updateProfile(auth.currentUser, {
         displayName: displayName,
       });
       console.log('Cập nhật Firebase Auth thành công!');
 
-      // Bước 2: Cập nhật mật khẩu nếu có
       if (password) {
         console.log('Bắt đầu cập nhật mật khẩu...');
         await updatePassword(auth.currentUser, password);
         console.log('Cập nhật mật khẩu thành công!');
       }
 
-      // Bước 3: Lưu birthday và phoneNumber vào Firestore
       console.log('Bắt đầu lưu vào Firestore...');
       await setDoc(
         doc(db, 'users', auth.currentUser.uid),
@@ -130,6 +122,7 @@ export default function EditProfileScreen() {
   };
 
   return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
     <LinearGradient
       colors={['#7B5AFF', '#A17BFF']}
       style={styles.container}
@@ -225,6 +218,7 @@ export default function EditProfileScreen() {
         </LinearGradient>
       </TouchableOpacity>
     </LinearGradient>
+    </TouchableWithoutFeedback>
   );
 }
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, TextInput, Text, StyleSheet, TouchableOpacity,Keyboard, TouchableWithoutFeedback, Image } from 'react-native';
 import { auth } from './firebaseConfig';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { router } from 'expo-router';
@@ -41,6 +41,7 @@ export default function SignInScreen() {
   };
 
   return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
     <LinearGradient
       colors={['#1E003D', '#1E003D']}
       style={styles.container}
@@ -132,6 +133,7 @@ export default function SignInScreen() {
         <Text style={styles.linkText}>Đăng nhập</Text>
       </TouchableOpacity>
     </LinearGradient>
+    </TouchableWithoutFeedback>
   );
 }
 

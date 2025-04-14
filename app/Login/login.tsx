@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, TextInput, Text, StyleSheet, TouchableOpacity, Keyboard, TouchableWithoutFeedback, Image } from 'react-native';
 import { auth } from './firebaseConfig';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { router } from 'expo-router';
@@ -23,6 +23,7 @@ export default function LoginScreen() {
   };
 
   return (
+     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
     <LinearGradient
       colors={['#1E003D', '#1E003D']}
       style={styles.container}
@@ -67,11 +68,16 @@ export default function LoginScreen() {
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
+      <TouchableOpacity onPress={() => router.push('/Login/resetpassword')}>
+        <Text style={styles.linkText}>Quên mật khẩu?</Text>
+      </TouchableOpacity>
+      
       <TouchableOpacity onPress={handleLogin}>
         <LinearGradient
           colors={['#7A4BCF', '#5C38A5']}
           style={styles.button}
         >
+  
           <Text style={styles.buttonText}>Đăng nhập</Text>
         </LinearGradient>
       </TouchableOpacity>
@@ -80,6 +86,7 @@ export default function LoginScreen() {
         <Text style={styles.linkText}>Tạo tài khoản</Text>
       </TouchableOpacity>
     </LinearGradient>
+    </TouchableWithoutFeedback>
   );
 }
 

@@ -12,14 +12,12 @@ export default function ProfileScreen() {
   const [user, setUser] = useState(auth.currentUser);
   const [userData, setUserData] = useState({ birthday: '', phoneNumber: '' });
 
-  // Lắng nghe trạng thái đăng nhập
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       console.log('Trạng thái người dùng thay đổi:', currentUser?.uid);
       setUser(currentUser);
 
       if (currentUser) {
-        // Tải dữ liệu từ Firestore
         const fetchUserData = async () => {
           console.log('Bắt đầu tải dữ liệu từ Firestore...');
           try {
@@ -44,7 +42,7 @@ export default function ProfileScreen() {
       }
     });
 
-    return () => unsubscribe(); // Hủy lắng nghe khi component unmount
+    return () => unsubscribe(); 
   }, []);
 
   const handleSignOut = async () => {
@@ -61,13 +59,11 @@ export default function ProfileScreen() {
       colors={['#1E003D', '#0A0A23']}
       style={styles.container}
     >
-      {/* Logo */}
       <Image
         source={require('../../assets/icons/logo1.png')}
         style={styles.logo}
       />
 
-      {/* Nút quay lại */}
       <TouchableOpacity
         style={styles.backButton}
         onPress={() => router.back()}
@@ -113,7 +109,7 @@ export default function ProfileScreen() {
       </View>
 
       {/* Nút Edit profile */}
-      <TouchableOpacity onPress={() => router.push('/edit')}>
+      <TouchableOpacity onPress={() => router.push('/Edit/edit')}>
         <LinearGradient
           colors={['#7B5AFF', '#A17BFF']}
           style={styles.button}
