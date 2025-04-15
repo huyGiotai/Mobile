@@ -82,7 +82,7 @@ export default function ResetPasswordScreen() {
             </LinearGradient>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => router.push('./login')}>
+          <TouchableOpacity onPress={() => router.replace('./login')}>
             <Text style={styles.linkText}>Quay lại đăng nhập</Text>
           </TouchableOpacity>
         </ScrollView>

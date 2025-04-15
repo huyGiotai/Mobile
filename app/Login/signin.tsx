@@ -129,7 +129,7 @@ export default function SignInScreen() {
         </LinearGradient>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => router.push('/Login/login')}>
+      <TouchableOpacity onPress={() => router.replace('/Login/login')}>
         <Text style={styles.linkText}>Đăng nhập</Text>
       </TouchableOpacity>
     </LinearGradient>

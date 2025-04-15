@@ -80,7 +80,7 @@ export default function ProfileScreen() {
   const handleSignOut = async () => {
     try {
       await signOut(auth);
-      router.push('/Landing/Landing');
+      router.replace('/Login/login'); 
     } catch (e) {
       console.log('Đăng xuất thất bại:', e);
     }

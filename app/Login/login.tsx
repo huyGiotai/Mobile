@@ -15,7 +15,7 @@ export default function LoginScreen() {
   const handleLogin = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      router.push('/');
+      router.replace('/');
     } catch (e) {
       setError('Đăng nhập thất bại. Vui lòng kiểm tra lại!');
       console.log(e);
@@ -68,7 +68,7 @@ export default function LoginScreen() {
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
-      <TouchableOpacity onPress={() => router.push('/Login/resetpassword')}>
+      <TouchableOpacity onPress={() => router.replace('/Login/resetpassword')}>
         <Text style={styles.linkText}>Quên mật khẩu?</Text>
       </TouchableOpacity>
       
@@ -82,7 +82,7 @@ export default function LoginScreen() {
         </LinearGradient>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => router.push('/Login/signin')}>
+      <TouchableOpacity onPress={() => router.replace('/Login/signin')}>
         <Text style={styles.linkText}>Tạo tài khoản</Text>
       </TouchableOpacity>
     </LinearGradient>
