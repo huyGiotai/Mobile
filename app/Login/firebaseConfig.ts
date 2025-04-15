@@ -2,6 +2,7 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import {getFunctions} from 'firebase/functions';
+
 const firebaseConfig = {
   apiKey: "AIzaSyCc9PzHXEzwRsw-wQUyLJzVk7f_igVc7I0",
   authDomain: "nguyen-mobile.firebaseapp.com",

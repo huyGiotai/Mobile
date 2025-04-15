@@ -128,7 +128,7 @@ export default function EditProfileScreen() {
 
       setSuccess('Lưu thông tin thành công!');
       setTimeout(() => {
-        router.push('/profile');
+        router.replace('/profile');
       }, 2000);
     } catch (e) {
       setError(`Lưu thất bại: ${e instanceof Error ? e.message : String(e)}`);

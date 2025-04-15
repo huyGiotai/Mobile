@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Linking } from 'react-native';
 import { auth } from '../Login/firebaseConfig';
 import { db } from '../Login/firebaseConfig';
 import { doc, getDoc } from 'firebase/firestore';
@@ -54,10 +54,10 @@ export default function ProfileScreen() {
             console.log('Lỗi khi tải dữ liệu từ Firestore:', e);
             setUserData({
               birthday: '',
-              phoneNumber: '',
-              facebook: '',
-              tiktok: '',
-              instagram: '',
+                phoneNumber: '',
+                facebook: '',
+                tiktok: '',
+                instagram: '',
             });
           }
         };
@@ -80,9 +80,37 @@ export default function ProfileScreen() {
   const handleSignOut = async () => {
     try {
       await signOut(auth);
-      router.replace('/Login/login'); 
+      router.replace('/Login/login');
     } catch (e) {
       console.log('Đăng xuất thất bại:', e);
+    }
+  };
+
+  const openSocialLink = async (url: string, platform: string) => {
+    if (!url || url === 'Chưa cập nhật') {
+      return;
+    }
+
+    let formattedUrl = url;
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      if (platform === 'facebook') {
+        formattedUrl = `https://facebook.com/${url}`;
+      } else if (platform === 'tiktok') {
+        formattedUrl = `https://tiktok.com/@${url}`;
+      } else if (platform === 'instagram') {
+        formattedUrl = `https://instagram.com/${url}`;
+      }
+    }
+
+    try {
+      const supported = await Linking.canOpenURL(formattedUrl);
+      if (supported) {
+        await Linking.openURL(formattedUrl);
+      } else {
+        console.log(`Không thể mở URL: ${formattedUrl}`);
+      }
+    } catch (e) {
+      console.log(`Lỗi khi mở URL ${platform}:`, e);
     }
   };
 
@@ -91,99 +119,99 @@ export default function ProfileScreen() {
       colors={['#1E003D', '#0A0A23']}
       style={styles.container}
     >
-      <View>
-        <Image
-          source={images.bg}
-          className="absolute w-full z-0 h-full mt-30 "
-          resizeMode="cover"
-        />
-        <TouchableOpacity onPress={() => router.push('/')}>
-          <Image source={icons.logo} className="w-12 h-10 mt-50 mb-5 mx-auto" />
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View>
+          <Image
+            source={images.bg}
+            style={styles.backgroundImage}
+            resizeMode="cover"
+          />
+          <TouchableOpacity onPress={() => router.push('/')}>
+            <Image source={icons.logo} style={styles.logo} />
+          </TouchableOpacity>
+        </View>
+
+        {/* <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => router.back()}
+        >
+          <Ionicons name="arrow-back" size={24} color="#fff" />
+        </TouchableOpacity> */}
+
+        <Text style={styles.title}>{user?.displayName || user?.email || 'Người dùng'}</Text>
+
+        <View style={styles.infoContainer}>
+          <View style={styles.infoRow}>
+            <Ionicons name="person-outline" size={20} color="#7B5AFF" style={styles.icon} />
+            <Text style={styles.infoText}>{user?.displayName || user?.email || 'Người dùng'}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Ionicons name="calendar-outline" size={20} color="#7B5AFF" style={styles.icon} />
+            <Text style={styles.infoText}>{userData.birthday || 'Chưa cập nhật'}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Ionicons name="phone-portrait-outline" size={20} color="#7B5AFF" style={styles.icon} />
+            <Text style={styles.infoText}>{userData.phoneNumber || 'Chưa cập nhật'}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Ionicons name="mail-outline" size={20} color="#7B5AFF" style={styles.icon} />
+            <Text style={styles.infoText}>{user?.email || 'Không có'}</Text>
+          </View>
+          <TouchableOpacity
+            style={styles.infoRow}
+            onPress={() => openSocialLink(userData.facebook, 'facebook')}
+            disabled={!userData.facebook || userData.facebook === 'Chưa cập nhật'}
+          >
+            <Ionicons name="logo-facebook" size={20} color="#7B5AFF" style={styles.icon} />
+            <Text style={[styles.infoText, userData.facebook && userData.facebook !== 'Chưa cập nhật' ? styles.linkText : {}]}>
+              {userData.facebook || 'Chưa cập nhật'}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.infoRow}
+            onPress={() => openSocialLink(userData.tiktok, 'tiktok')}
+            disabled={!userData.tiktok || userData.tiktok === 'Chưa cập nhật'}
+          >
+            <Ionicons name="logo-tiktok" size={20} color="#7B5AFF" style={styles.icon} />
+            <Text style={[styles.infoText, userData.tiktok && userData.tiktok !== 'Chưa cập nhật' ? styles.linkText : {}]}>
+              {userData.tiktok || 'Chưa cập nhật'}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.infoRow}
+            onPress={() => openSocialLink(userData.instagram, 'instagram')}
+            disabled={!userData.instagram || userData.instagram === 'Chưa cập nhật'}
+          >
+            <Ionicons name="logo-instagram" size={20} color="#7B5AFF" style={styles.icon} />
+            <Text style={[styles.infoText, userData.instagram && userData.instagram !== 'Chưa cập nhật' ? styles.linkText : {}]}>
+              {userData.instagram || 'Chưa cập nhật'}
+            </Text>
+          </TouchableOpacity>
+          <View style={styles.infoRow}>
+            <Ionicons name="eye-off-outline" size={20} color="#7B5AFF" style={styles.icon} />
+            <Text style={styles.infoText}>Password</Text>
+            <Ionicons name="refresh-outline" size={20} color="#7B5AFF" style={styles.iconRight} />
+          </View>
+        </View>
+
+        <TouchableOpacity onPress={() => router.push('/Edit/edit')}>
+          <LinearGradient
+            colors={['#7B5AFF', '#A17BFF']}
+            style={styles.button}
+          >
+            <Text style={styles.buttonText}>Edit profile</Text>
+          </LinearGradient>
         </TouchableOpacity>
-      </View>
 
-      {/* Nút quay lại */}
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => router.back()}
-      >
-        {/* <Ionicons name="arrow-back" size={24} color="#fff" /> */}
-      </TouchableOpacity>
-
-      {/* Tiêu đề (Tên người dùng) */}
-      <Text style={styles.title}>{user?.displayName || user?.email || 'Người dùng'}</Text>
-
-      {/* Các trường thông tin */}
-      <View style={styles.infoContainer}>
-        {/* Tên */}
-        <View style={styles.infoRow}>
-          <Ionicons name="person-outline" size={20} color="#7B5AFF" style={styles.icon} />
-          <Text style={styles.infoText}>{user?.displayName || user?.email || 'Người dùng'}</Text>
-        </View>
-
-        {/* Sinh nhật */}
-        <View style={styles.infoRow}>
-          <Ionicons name="calendar-outline" size={20} color="#7B5AFF" style={styles.icon} />
-          <Text style={styles.infoText}>{userData.birthday || 'Chưa cập nhật'}</Text>
-        </View>
-
-        {/* Số điện thoại */}
-        <View style={styles.infoRow}>
-          <Ionicons name="phone-portrait-outline" size={20} color="#7B5AFF" style={styles.icon} />
-          <Text style={styles.infoText}>{userData.phoneNumber || 'Chưa cập nhật'}</Text>
-        </View>
-
-        {/* Email */}
-        <View style={styles.infoRow}>
-          <Ionicons name="mail-outline" size={20} color="#7B5AFF" style={styles.icon} />
-          <Text style={styles.infoText}>{user?.email || 'Không có'}</Text>
-        </View>
-
-        {/* Facebook */}
-        <View style={styles.infoRow}>
-          <Ionicons name="logo-facebook" size={20} color="#7B5AFF" style={styles.icon} />
-          <Text style={styles.infoText}>{userData.facebook || 'Chưa cập nhật'}</Text>
-        </View>
-
-        {/* TikTok */}
-        <View style={styles.infoRow}>
-          <Ionicons name="logo-tiktok" size={20} color="#7B5AFF" style={styles.icon} />
-          <Text style={styles.infoText}>{userData.tiktok || 'Chưa cập nhật'}</Text>
-        </View>
-
-        {/* Instagram */}
-        <View style={styles.infoRow}>
-          <Ionicons name="logo-instagram" size={20} color="#7B5AFF" style={styles.icon} />
-          <Text style={styles.infoText}>{userData.instagram || 'Chưa cập nhật'}</Text>
-        </View>
-
-        {/* Mật khẩu */}
-        <View style={styles.infoRow}>
-          <Ionicons name="eye-off-outline" size={20} color="#7B5AFF" style={styles.icon} />
-          <Text style={styles.infoText}>Password</Text>
-          <Ionicons name="refresh-outline" size={20} color="#7B5AFF" style={styles.iconRight} />
-        </View>
-      </View>
-
-      {/* Nút Edit profile */}
-      <TouchableOpacity onPress={() => router.push('/Edit/edit')}>
-        <LinearGradient
-          colors={['#7B5AFF', '#A17BFF']}
-          style={styles.button}
-        >
-          <Text style={styles.buttonText}>Edit profile</Text>
-        </LinearGradient>
-      </TouchableOpacity>
-
-      {/* Nút Đăng xuất */}
-      <TouchableOpacity onPress={handleSignOut}>
-        <LinearGradient
-          colors={['#7B5AFF', '#A17BFF']}
-          style={styles.button}
-        >
-          <Text style={styles.buttonText}>Đăng xuất</Text>
-        </LinearGradient>
-      </TouchableOpacity>
+        <TouchableOpacity onPress={handleSignOut}>
+          <LinearGradient
+            colors={['#7B5AFF', '#A17BFF']}
+            style={styles.button}
+          >
+            <Text style={styles.buttonText}>Đăng xuất</Text>
+          </LinearGradient>
+        </TouchableOpacity>
+      </ScrollView>
     </LinearGradient>
   );
 }
@@ -191,14 +219,25 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  scrollContent: {
     paddingHorizontal: 20,
-    paddingTop: 40,
+    paddingTop: 0,
+    paddingBottom: 30, // Thêm padding dưới để nút cuối không bị cắt
+  },
+  backgroundImage: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    zIndex: 0,
+    marginTop: 0,
   },
   logo: {
-    width: 100,
-    height: 100,
+    width: 48,
+    height: 40,
     alignSelf: 'center',
-    marginBottom: 20,
+    marginTop: 50,
+    marginBottom: 5,
   },
   backButton: {
     position: 'absolute',
@@ -236,6 +275,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#000',
     flex: 1,
+  },
+  linkText: {
+    color: '#7B5AFF',
+    textDecorationLine: 'underline',
   },
   button: {
     paddingVertical: 12,
