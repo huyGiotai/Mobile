@@ -1,102 +1,53 @@
-
-
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   View,
   Text,
-  ActivityIndicator,
   ScrollView,
   Image,
   FlatList,
   TouchableOpacity,
 } from "react-native";
-import { Redirect, router, useRouter } from "expo-router";
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-
-import useFetch from "@/services/usefetch";
-import { fetchMovies } from "@/services/api";
-import { getTrendingMovies } from "@/services/appwrite";
-
+import { router } from "expo-router";
 import { icons } from "@/constants/icons";
 import { images } from "@/constants/images";
-
-import SearchBar from "@/components/SearchBar";
 import MovieCard from "@/components/MovieCard";
-import TrendingCard from "@/components/TrendingCard";
-
+import { useMovieContext } from "@/context/MovieContext";
 
 const Save = () => {
-  const {
-    data: movies,
-    loading: moviesLoading,
-    error: moviesError,
-  } = useFetch(() => fetchMovies({ query: "" }));
+  const { savedMovies } = useMovieContext();
 
-  const {
-    data: trendingMovies,
-    loading: trendingLoading,
-    error: trendingError,
-  } = useFetch(getTrendingMovies);
-
-  
-  
-   return (
-     <SafeAreaView className="bg-primary flex-1">
+  return (
+    <SafeAreaView className="bg-primary flex-1">
       <Image
         source={images.bg}
         className="absolute w-full z-0"
         resizeMode="cover"
       />
-       <View className="flex justify-center items-center flex-1 flex-col gap-5">
-       <ScrollView 
-       >
-        <TouchableOpacity onPress={() => router.push('/')}> 
-          <Image source={icons.logo} className="w-12 h-10 mt-20 mb-5 mx-auto" />
+      <View className="flex justify-center items-center flex-1 flex-col gap-5">
+        <ScrollView>
+          <TouchableOpacity onPress={() => router.push("/")}>
+            <Image source={icons.logo} className="w-12 h-10 mt-20 mb-5 mx-auto" />
           </TouchableOpacity>
-       <Text className="text-lg text-white font-bold mt-5 mb-3"
-       style={{ fontSize: 20 }}>
-                My List Movies
-       </Text>
+          <Text
+            className="text-lg text-white font-bold mt-5 mb-3"
+            style={{ fontSize: 20 }}
+          >
+            Danh sách phim yêu thích
+          </Text>
 
-        <View>
-        {trendingMovies && (
-              <View className="mt-10">
-                <FlatList
-                  // horizontal
-                  // showsHorizontalScrollIndicator={false}
-                  className="mb-4 mt-3"
-                  data={trendingMovies}
-                  // contentContainerStyle={{
-                  //   gap: 26,
-                  // }}
-                  renderItem={({ item, index }) => (
-                    <TrendingCard movie={item} index={index} />
-                  )}
-                  keyExtractor={(item, index) => `${item.movie_id}-${index}`}
-                  ItemSeparatorComponent={() => <View className="w-4" />}
-                  
-                  numColumns={3}
-                columnWrapperStyle={{
-                  justifyContent: "flex-start",
-                  gap: 20,
-                  paddingRight: 5,
-                  marginBottom: 10,
-                }}
-                // className="mt-2 pb-32"
-                scrollEnabled={false}
-                  
-                  
-                />
-              </View>
-            )}
-        
-       {/* <FlatList 
-                
-                data={movies}
+          {savedMovies.length > 0 ? (
+            <View className="mt-10">
+              <FlatList
+                data={savedMovies}
                 renderItem={({ item }) => (
-                  
-                  <MovieCard {...item} />)}
-                keyExtractor={(item, index) => `${item.id}-${index}`}
+                  <MovieCard
+                    id={parseInt(item.movie_id)} // Chuyển string thành number
+                    title={item.title}
+                    poster_path={item.poster_path}
+                    vote_average={item.vote_average ?? 0}
+                    release_date={item.release_date ?? ""} adult={false} backdrop_path={""} genre_ids={[]} original_language={""} original_title={""} overview={""} popularity={0} video={false} vote_count={0}                  />
+                )}
+                keyExtractor={(item, index) => `${item.movie_id}-${index}`}
                 numColumns={3}
                 columnWrapperStyle={{
                   justifyContent: "flex-start",
@@ -104,21 +55,16 @@ const Save = () => {
                   paddingRight: 5,
                   marginBottom: 10,
                 }}
-                className="mt-2 pb-32"
                 scrollEnabled={false}
-                
-              /> */}
-              
-              
-              </View>
-        
+              />
+            </View>
+          ) : (
+            <Text className="text-white mt-10">Chưa có phim nào được lưu.</Text>
+          )}
         </ScrollView>
-        
-       </View>
-     </SafeAreaView>
-   );
-  }
-  
- 
+      </View>
+    </SafeAreaView>
+  );
+};
 
 export default Save;

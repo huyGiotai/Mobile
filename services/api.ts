@@ -52,3 +52,23 @@ export const fetchMovieDetails = async (
     throw error;
   }
 };
+
+export const fetchMovieVideos = async (movieId: string): Promise<{ key: string; type: string }[]> => {
+  if (!TMDB_CONFIG.API_KEY) {
+    throw new Error("TMDB API key is missing in environment variables.");
+  }
+  try {
+    const response = await fetch(
+      `${TMDB_CONFIG.BASE_URL}/movie/${movieId}/videos?api_key=${TMDB_CONFIG.API_KEY}&language=vi-VN`
+    );
+    if (!response.ok) {
+      console.error(`Failed to fetch videos: ${response.status} - ${response.statusText}`);
+      return []; // Trả về mảng rỗng nếu yêu cầu thất bại
+    }
+    const data = await response.json();
+    return data.results || []; // Trả về mảng rỗng nếu không có video
+  } catch (error) {
+    console.error(`Error fetching videos for movie ${movieId}:`, error);
+    return []; // Trả về mảng rỗng để tránh lỗi
+  }
+};
