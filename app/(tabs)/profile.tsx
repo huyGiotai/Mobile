@@ -18,6 +18,7 @@ export default function ProfileScreen() {
     facebook: '',
     tiktok: '',
     instagram: '',
+    avatarUrl: '', // Thêm trường avatarUrl để lưu URL avatar
   });
 
   useEffect(() => {
@@ -39,6 +40,7 @@ export default function ProfileScreen() {
                 facebook: userDoc.data().facebook || '',
                 tiktok: userDoc.data().tiktok || '',
                 instagram: userDoc.data().instagram || '',
+                avatarUrl: userDoc.data().avatarUrl || '', // Lấy avatarUrl từ Firestore
               });
             } else {
               console.log('Không tìm thấy dữ liệu Firestore cho người dùng này.');
@@ -48,16 +50,18 @@ export default function ProfileScreen() {
                 facebook: '',
                 tiktok: '',
                 instagram: '',
+                avatarUrl: '',
               });
             }
           } catch (e) {
             console.log('Lỗi khi tải dữ liệu từ Firestore:', e);
             setUserData({
               birthday: '',
-                phoneNumber: '',
-                facebook: '',
-                tiktok: '',
-                instagram: '',
+              phoneNumber: '',
+              facebook: '',
+              tiktok: '',
+              instagram: '',
+              avatarUrl: '',
             });
           }
         };
@@ -70,6 +74,7 @@ export default function ProfileScreen() {
           facebook: '',
           tiktok: '',
           instagram: '',
+          avatarUrl: '',
         });
       }
     });
@@ -131,14 +136,20 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.back()}
-        >
-          <Ionicons name="arrow-back" size={24} color="#fff" />
-        </TouchableOpacity> */}
-
         <Text style={styles.title}>{user?.displayName || user?.email || 'Người dùng'}</Text>
+
+        {/* Thêm phần hiển thị avatar */}
+        <View style={styles.avatarContainer}>
+          {userData.avatarUrl ? (
+            <Image source={{ uri: userData.avatarUrl }} style={styles.avatar} />
+          ) : (
+            <View style={styles.avatarPlaceholder}>
+              <Text style={styles.avatarText}>
+                {(user?.displayName || user?.email || 'N')[0].toUpperCase()}
+              </Text>
+            </View>
+          )}
+        </View>
 
         <View style={styles.infoContainer}>
           <View style={styles.infoRow}>
@@ -223,7 +234,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 20,
     paddingTop: 0,
-    paddingBottom: 30, // Thêm padding dưới để nút cuối không bị cắt
+    paddingBottom: 30,
   },
   backgroundImage: {
     position: 'absolute',
@@ -239,17 +250,39 @@ const styles = StyleSheet.create({
     marginTop: 50,
     marginBottom: 5,
   },
-  backButton: {
-    position: 'absolute',
-    top: 40,
-    left: 20,
-  },
   title: {
     fontSize: 24,
     color: '#fff',
     fontWeight: 'bold',
     textAlign: 'center',
+    marginBottom: 10, // Giảm margin để làm chỗ cho avatar
+  },
+  // Thêm style cho avatar
+  avatarContainer: {
+    alignItems: 'center',
     marginBottom: 20,
+  },
+  avatar: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
+  avatarPlaceholder: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: '#7B5AFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
+  avatarText: {
+    fontSize: 40,
+    color: '#fff',
+    fontWeight: 'bold',
   },
   infoContainer: {
     backgroundColor: '#fff',

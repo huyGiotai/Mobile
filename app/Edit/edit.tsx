@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Keyboard, TouchableWithoutFeedback, Image, ActivityIndicator } from 'react-native';
 import { auth } from '../Login/firebaseConfig';
 import { updateProfile, updatePassword } from 'firebase/auth';
 import { db } from '../Login/firebaseConfig';
@@ -7,6 +7,7 @@ import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 
 export default function EditProfileScreen() {
   const user = auth.currentUser;
@@ -17,11 +18,12 @@ export default function EditProfileScreen() {
   const [facebook, setFacebook] = useState('');
   const [tiktok, setTiktok] = useState('');
   const [instagram, setInstagram] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  // Tải dữ liệu ban đầu từ Firestore khi vào trang
   useEffect(() => {
     const fetchUserData = async () => {
       if (user) {
@@ -35,7 +37,8 @@ export default function EditProfileScreen() {
               phoneNumber: string; 
               facebook: string; 
               tiktok: string; 
-              instagram: string 
+              instagram: string;
+              avatarUrl: string;
             };
             console.log('Dữ liệu Firestore (Edit):', data);
             setBirthday(data.birthday || '');
@@ -43,6 +46,7 @@ export default function EditProfileScreen() {
             setFacebook(data.facebook || '');
             setTiktok(data.tiktok || '');
             setInstagram(data.instagram || '');
+            setAvatarUrl(data.avatarUrl || '');
           } else {
             console.log('Không tìm thấy dữ liệu Firestore cho người dùng này.');
           }
@@ -54,6 +58,66 @@ export default function EditProfileScreen() {
 
     fetchUserData();
   }, [user]);
+
+  const pickImage = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissionResult.granted) {
+      alert('Cần quyền truy cập thư viện ảnh để chọn avatar!');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: 'images', // ✅ đúng cú pháp
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.5,
+    });
+    
+    
+
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      const uri = result.assets[0].uri;
+      await uploadAvatar(uri);
+    }
+  };
+
+  const uploadAvatar = async (uri: string) => {
+    setLoading(true);
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        alert('Bạn cần đăng nhập để thực hiện hành động này!');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', {
+        uri: uri,
+        type: 'image/jpeg',
+        name: `avatar-${user.uid}.jpg`,
+      } as any);
+      formData.append('upload_preset', 'avatar_upload');
+      formData.append('cloud_name', 'dp26raxtu');
+
+      const response = await fetch('https://api.cloudinary.com/v1_1/dp26raxtu/image/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+      if (!result.secure_url) {
+        throw new Error('Tải ảnh lên thất bại!');
+      }
+
+      const downloadUrl = result.secure_url;
+      setAvatarUrl(downloadUrl);
+      setSuccess('Cập nhật avatar thành công!');
+    } catch (e) {
+      setError(`Lỗi khi tải avatar: ${e instanceof Error ? e.message : String(e)}`);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const validateBirthday = (date: string) => {
     const regex = /^\d{2}\/\d{2}\/\d{4}$/;
@@ -121,6 +185,7 @@ export default function EditProfileScreen() {
           facebook: facebook || '',
           tiktok: tiktok || '',
           instagram: instagram || '',
+          avatarUrl: avatarUrl || '',
         },
         { merge: true }
       );
@@ -153,6 +218,23 @@ export default function EditProfileScreen() {
         </TouchableOpacity>
 
         <Text style={styles.title}>{displayName || 'Người dùng'}</Text>
+
+        <View style={styles.avatarContainer}>
+          {loading ? (
+            <ActivityIndicator size="large" color="#fff" />
+          ) : avatarUrl ? (
+            <Image source={{ uri: avatarUrl }} style={styles.avatar} />
+          ) : (
+            <View style={styles.avatarPlaceholder}>
+              <Text style={styles.avatarText}>
+                {(displayName || user?.email || 'N')[0].toUpperCase()}
+              </Text>
+            </View>
+          )}
+          <TouchableOpacity onPress={pickImage} style={styles.changeAvatarButton}>
+            <Text style={styles.changeAvatarText}>Thay đổi avatar</Text>
+          </TouchableOpacity>
+        </View>
 
         <View style={styles.infoContainer}>
           <View style={styles.infoRow}>
@@ -301,7 +383,41 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     textAlign: 'center',
+    marginBottom: 10,
+  },
+  avatarContainer: {
+    alignItems: 'center',
     marginBottom: 20,
+  },
+  avatar: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
+  avatarPlaceholder: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#fff',
+  },
+  avatarText: {
+    fontSize: 40,
+    color: '#7B5AFF',
+    fontWeight: 'bold',
+  },
+  changeAvatarButton: {
+    marginTop: 10,
+  },
+  changeAvatarText: {
+    color: '#fff',
+    fontSize: 16,
+    textDecorationLine: 'underline',
   },
   infoContainer: {
     backgroundColor: '#fff',
