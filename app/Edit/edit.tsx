@@ -204,7 +204,7 @@ export default function EditProfileScreen() {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <LinearGradient
-        colors={['#7B5AFF', '#A17BFF']}
+        colors={['#1E003D', '#0A0A23']}
         style={styles.container}
       >
         <TouchableOpacity

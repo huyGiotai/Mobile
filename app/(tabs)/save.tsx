@@ -24,7 +24,7 @@ const Save = () => {
         resizeMode="cover"
       />
       <View className="flex justify-center items-center flex-1 flex-col gap-5">
-        <ScrollView>
+        <ScrollView showsVerticalScrollIndicator={false}>
           <TouchableOpacity onPress={() => router.push("/")}>
             <Image source={icons.logo} className="w-12 h-10 mt-20 mb-5 mx-auto" />
           </TouchableOpacity>

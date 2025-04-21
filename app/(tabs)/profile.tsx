@@ -124,13 +124,13 @@ export default function ProfileScreen() {
       colors={['#1E003D', '#0A0A23']}
       style={styles.container}
     >
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View>
-          <Image
-            source={images.bg}
-            style={styles.backgroundImage}
-            resizeMode="cover"
-          />
+        <Image
+          source={images.bg}
+          className="absolute transform -translate-x-3"
+          resizeMode="cover"
+      />
           <TouchableOpacity onPress={() => router.push('/')}>
             <Image source={icons.logo} style={styles.logo} />
           </TouchableOpacity>
