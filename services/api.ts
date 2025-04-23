@@ -9,12 +9,16 @@ export const TMDB_CONFIG = {
 
 export const fetchMovies = async ({
   query,
+  page = 1, // Thêm tham số page với giá trị mặc định là 1
 }: {
   query: string;
+  page?: number;
 }): Promise<Movie[]> => {
   const endpoint = query
-    ? `${TMDB_CONFIG.BASE_URL}/search/movie?query=${encodeURIComponent(query)}`
-    : `${TMDB_CONFIG.BASE_URL}/discover/movie?sort_by=popularity.desc`;
+    ? `${TMDB_CONFIG.BASE_URL}/search/movie?query=${encodeURIComponent(
+        query
+      )}&page=${page}`
+    : `${TMDB_CONFIG.BASE_URL}/discover/movie?sort_by=popularity.desc&page=${page}`;
 
   const response = await fetch(endpoint, {
     method: "GET",
@@ -29,6 +33,7 @@ export const fetchMovies = async ({
   return data.results;
 };
 
+// Các hàm khác (fetchMovieDetails, fetchMovieVideos) giữ nguyên
 export const fetchMovieDetails = async (
   movieId: string
 ): Promise<MovieDetails> => {
@@ -53,7 +58,9 @@ export const fetchMovieDetails = async (
   }
 };
 
-export const fetchMovieVideos = async (movieId: string): Promise<{ key: string; type: string }[]> => {
+export const fetchMovieVideos = async (
+  movieId: string
+): Promise<{ key: string; type: string }[]> => {
   if (!TMDB_CONFIG.API_KEY) {
     throw new Error("TMDB API key is missing in environment variables.");
   }
@@ -62,13 +69,15 @@ export const fetchMovieVideos = async (movieId: string): Promise<{ key: string; 
       `${TMDB_CONFIG.BASE_URL}/movie/${movieId}/videos?api_key=${TMDB_CONFIG.API_KEY}&language=vi-VN`
     );
     if (!response.ok) {
-      console.error(`Failed to fetch videos: ${response.status} - ${response.statusText}`);
-      return []; // Trả về mảng rỗng nếu yêu cầu thất bại
+      console.error(
+        `Failed to fetch videos: ${response.status} - ${response.statusText}`
+      );
+      return [];
     }
     const data = await response.json();
-    return data.results || []; // Trả về mảng rỗng nếu không có video
+    return data.results || [];
   } catch (error) {
     console.error(`Error fetching videos for movie ${movieId}:`, error);
-    return []; // Trả về mảng rỗng để tránh lỗi
+    return [];
   }
 };
