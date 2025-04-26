@@ -11,6 +11,7 @@ import {
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { icons } from "@/constants/icons";
+import { Ionicons } from "@expo/vector-icons"; // Thêm Ionicons
 import useFetch from "@/services/usefetch";
 import { fetchMovieDetails, fetchMovieVideos } from "@/services/api";
 import { useMovieContext } from "@/context/MovieContext";
@@ -162,10 +163,19 @@ const Details = () => {
             onPress={handleSave}
             className="absolute bottom-15 right-5 rounded-full size-14 flex items-center justify-center"
           >
-            <Image
-              source={isSaved ? icons.save : icons.save} // Icon không thay đổi giữa trạng thái
-              className="size-7"
-            />
+            {isSaved ? (
+              <Ionicons
+              name="bookmark-outline" // Biểu tượng khác cho lưu
+              size={28}
+              color="green" 
+              />
+            ) : (
+              <Image
+                source={icons.save}
+                className="size-7"
+                tintColor="#FFF" // Trắng khi chưa lưu
+              />
+            )}
           </TouchableOpacity>
         </View>
 
